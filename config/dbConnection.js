@@ -24,8 +24,7 @@ var connMongoDB = {
             });
         });
     },
-    iniciaJogo: function (res, usuario, casa) {
-        console.log('_usuario', usuario);
+    iniciaJogo: function (res, usuario, casa, msg) {
         mongo.MongoClient.connect(url, function (err, db) {
             if (err) return console.log("error", err);
             var database = db.db("got");
@@ -35,10 +34,10 @@ var connMongoDB = {
                 collection.find({
                     usuario: usuario
                 }).toArray(function (err, result) {
-                    console.log('_result[0]', result[0]);
                     res.render('jogo', {
                         imgCasa: casa,
-                        jogo: result[0]
+                        jogo: result[0],
+                        mensagem: msg
                     });
                     db.close();
                 });
@@ -71,6 +70,51 @@ var connMongoDB = {
                 });
 
                 db.close();
+            });
+        });
+    },
+    executaAcao: function (params, res) {
+        var date = new Date();
+        var tempo = 0;
+        switch (params.acao) {
+            case 1:
+                tempo = 1 * 60 * 60000;
+                break;
+            case 2:
+                tempo = 2 * 60 * 60000;
+                break;
+            case 3:
+            case 4:
+                tempo = 5 * 60 * 60000;
+                break;
+        }
+        params.acao_termina_em = date.getTime() + tempo;
+        mongo.MongoClient.connect(url, function (err, db) {
+            if (err) return console.log("error", err);
+            var database = db.db("got");
+            database.collection('acao', function (errCollection, collection) {
+                if (errCollection) return console.log("error", errCollection);
+                collection.insertOne(params);
+                res.redirect("jogo?msg=B");
+                db.close();
+            });
+        });
+    },
+    getAcoes: function (res, usuario) {
+        mongo.MongoClient.connect(url, function (err, db) {
+            if (err) return console.log("error", err);
+            var database = db.db("got");
+            database.collection('acao', function (errCollection, collection) {
+                if (errCollection) return console.log("error", errCollection);
+
+                collection.find({
+                    usuario: usuario
+                }).toArray(function (err, result) {
+                    res.render('pergaminhos', {
+                        acoes: result
+                    });
+                    db.close();
+                });
             });
         });
     }

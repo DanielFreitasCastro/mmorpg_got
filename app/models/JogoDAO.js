@@ -14,8 +14,16 @@ JogoDAO.prototype.gerarParametros = function (usuario) {
     });
 };
 
-JogoDAO.prototype.iniciaJogo = function (res, usuario, casa) { 
-    this._connection.iniciaJogo(res, usuario, casa);
+JogoDAO.prototype.iniciaJogo = function (res, usuario, casa, msg) {
+    this._connection.iniciaJogo(res, usuario, casa, msg);
+};
+
+JogoDAO.prototype.acao = function (acao, res) {
+    this._connection.executaAcao(acao, res);
+};
+
+JogoDAO.prototype.getAcoes = function (res, usuario) {
+    this._connection.getAcoes(res, usuario);
 };
 
 module.exports = function () {
